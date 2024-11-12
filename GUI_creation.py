@@ -6,7 +6,7 @@ from datetime import datetime  # Importing the datetime module
 def create_gui():
     root = tk.Tk()
     root.title("Weather App")
-    root.geometry("500x500")
+    root.geometry("600x600")
     root.configure(bg="#e0f7fa")
 
     # General font
@@ -66,7 +66,7 @@ def display_weather(weather_data, forecast_data, display_area):
         current_weather = f"Current Weather in {weather_data['name']}:\n"
         current_weather += f"Temperature: {weather_data['main']['temp']}°F\n"
         current_weather += f"Humidity: {weather_data['main']['humidity']}%\n"
-        current_weather += f"Wind Speed: {weather_data['wind']['speed']} m/s\n"
+        current_weather += f"Wind Speed: {weather_data['wind']['speed']} mph\n"
         current_weather += f"Description: {weather_data['weather'][0]['description']}\n\n"
         display_area.insert(tk.END, current_weather)
 

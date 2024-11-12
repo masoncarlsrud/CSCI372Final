@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from API_integration import get_weather_data, get_forecast_data  # Importing the API integration methods
 from datetime import datetime  # Importing the datetime module
+from PIL import Image, ImageTk  # Importing the Pillow library
 
 def create_gui():
     root = tk.Tk()
@@ -78,8 +79,23 @@ def display_weather(weather_data, forecast_data, display_area):
                 formatted_date = date_time_obj.strftime('%A, %B %d, %Y %I:%M %p')
                 forecast += f"Date: {formatted_date}\n"
                 forecast += f"Temperature: {item['main']['temp']}°F\n"
-                forecast += f"Description: {item['weather'][0]['description']}\n\n"
+                forecast += f"Description: {item['weather'][0]['description']}\n"
+                
+                
+                icon_code = item['weather'][0]['icon'] #adding icons to the forecast
+                icon_path = f"icons/{icon_code}.png"
+                try:
+                    icon_image = Image.open(icon_path)
+                    icon_image = icon_image.resize((50, 50), Image.ANTIALIAS)
+                    icon_photo = ImageTk.PhotoImage(icon_image)
+                    display_area.image_create(tk.END, image=icon_photo)
+                    display_area.insert(tk.END, "\n\n")
+                except Exception as e:
+                    display_area.insert(tk.END, f"Error loading icon: {e}\n\n")
             x += 1
         display_area.insert(tk.END, forecast)
     else:
         display_area.insert(tk.END, "Error fetching weather data")
+
+if __name__ == "__main__":
+    create_gui()

@@ -29,11 +29,11 @@ def create_gui():
     location_entry = tk.Entry(input_frame, font=general_font)
     location_entry.pack(side=tk.LEFT, padx=5)
 
-    # Display Area
+    # Display area frame
     display_frame = tk.Frame(main_frame, bg="#ffffff", bd=2, relief=tk.SUNKEN)
     display_frame.pack(pady=10, fill=tk.BOTH, expand=True)
 
-    #Scrollbar
+    # Adding a scrollbar
     scrollbar = tk.Scrollbar(display_frame)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
@@ -51,7 +51,7 @@ def create_gui():
         else:
             messagebox.showwarning("Input Error", "Please enter a location")
 
-    # Search button
+    # Search button frame
     button_frame = tk.Frame(main_frame, bg="#e0f7fa")
     button_frame.pack(pady=10)
 
@@ -83,6 +83,3 @@ def display_weather(weather_data, forecast_data, display_area):
         display_area.insert(tk.END, forecast)
     else:
         display_area.insert(tk.END, "Error fetching weather data")
-
-if __name__ == "__main__":
-    create_gui()

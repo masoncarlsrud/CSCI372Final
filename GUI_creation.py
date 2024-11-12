@@ -1,21 +1,32 @@
 import tkinter as tk
 from tkinter import messagebox
-
-from API_integration import get_weather_data, get_forecast_data
+from API_integration import get_weather_data, get_forecast_data  # Importing the API integration methods
 
 def create_gui():
     root = tk.Tk()
     root.title("Weather App")
+    root.geometry("400x400")
+    root.configure(bg="#f0f0f0")
 
-    # Location input
-    location_label = tk.Label(root, text="Enter Location:")
-    location_label.pack()
-    location_entry = tk.Entry(root)
-    location_entry.pack()
+    # Main frame
+    main_frame = tk.Frame(root, bg="#f0f0f0", padx=10, pady=10)
+    main_frame.pack(expand=True, fill=tk.BOTH)
 
-    # Display area
-    weather_display = tk.Text(root, height=10, width=50)
-    weather_display.pack()
+    # Location input frame
+    input_frame = tk.Frame(main_frame, bg="#f0f0f0")
+    input_frame.pack(pady=10)
+
+    location_label = tk.Label(input_frame, text="Enter Location:", bg="#f0f0f0", font=("Helvetica", 12))
+    location_label.pack(side=tk.LEFT, padx=5)
+    location_entry = tk.Entry(input_frame, font=("Helvetica", 12))
+    location_entry.pack(side=tk.LEFT, padx=5)
+
+    # Display area frame
+    display_frame = tk.Frame(main_frame, bg="#ffffff", bd=2, relief=tk.SUNKEN)
+    display_frame.pack(pady=10, fill=tk.BOTH, expand=True)
+
+    weather_display = tk.Text(display_frame, height=10, width=50, bg="#ffffff", font=("Helvetica", 12))
+    weather_display.pack(padx=10, pady=10)
 
     def show_weather():
         location = location_entry.get()
@@ -26,8 +37,11 @@ def create_gui():
         else:
             messagebox.showwarning("Input Error", "Please enter a location")
 
-    # Search button
-    search_button = tk.Button(root, text="Search", command=show_weather)
+    # Search button frame
+    button_frame = tk.Frame(main_frame, bg="#f0f0f0")
+    button_frame.pack(pady=10)
+
+    search_button = tk.Button(button_frame, text="Search", command=show_weather, font=("Helvetica", 12), bg="#4CAF50", fg="#ffffff")
     search_button.pack()
 
     root.mainloop()

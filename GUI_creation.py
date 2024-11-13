@@ -38,7 +38,7 @@ def create_gui():
     scrollbar = tk.Scrollbar(display_frame)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-    weather_display = tk.Text(display_frame, height=15, width=60, bg="#ffffff", font=general_font, yscrollcommand=scrollbar.set)
+    weather_display = tk.Text(display_frame, height=15, width=60, bg="#f0f0f0", font=general_font, yscrollcommand=scrollbar.set)
     weather_display.pack(padx=10, pady=10)
 
     scrollbar.config(command=weather_display.yview)
@@ -72,22 +72,28 @@ def display_weather(weather_data, forecast_data, display_area):
         display_area.insert(tk.END, current_weather)
 
         forecast = "5 Day Forecast:\n"
+        images = []  # List to keep references to image objects
         x = 4
         for item in forecast_data['list'][:40]:
             if x % 8 == 0:
                 date_time_obj = datetime.strptime(item['dt_txt'], '%Y-%m-%d %H:%M:%S')
                 formatted_date = date_time_obj.strftime('%A, %B %d, %Y %I:%M %p')
+                
                 forecast += f"Date: {formatted_date}\n"
                 forecast += f"Temperature: {item['main']['temp']}°F\n"
+                forecast += f"Humidity: {item['main']['humidity']}%\n"
+                forecast += f"Wind Speed: {item['wind']['speed']} mph\n"
                 forecast += f"Description: {item['weather'][0]['description']}\n"
                 
-                
-                icon_code = item['weather'][0]['icon'] #adding icons to the forecast
+                # Add weather icon
+                icon_code = item['weather'][0]['icon']
                 icon_path = f"icons/{icon_code}.png"
                 try:
                     icon_image = Image.open(icon_path)
-                    icon_image = icon_image.resize((50, 50), Image.ANTIALIAS)
+                    icon_image = icon_image.resize((50, 50), Image.LANCZOS)  # Use Image.LANCZOS instead of Image.ANTIALIAS
                     icon_photo = ImageTk.PhotoImage(icon_image)
+                    images.append(icon_photo)  # Keep a reference to avoid garbage collection
+                    display_area.insert(tk.END, "\n")
                     display_area.image_create(tk.END, image=icon_photo)
                     display_area.insert(tk.END, "\n\n")
                 except Exception as e:
@@ -96,6 +102,3 @@ def display_weather(weather_data, forecast_data, display_area):
         display_area.insert(tk.END, forecast)
     else:
         display_area.insert(tk.END, "Error fetching weather data")
-
-if __name__ == "__main__":
-    create_gui()

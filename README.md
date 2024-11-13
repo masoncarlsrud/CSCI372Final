@@ -19,7 +19,6 @@ This project is a weather application that fetches real-time weather data from t
 
 ### Installation
 1. **Clone the repository**:
-   - ```sh
    - git clone https://github.com/masoncarlsrud/CSCI372Final.git
    - cd CSCI372Final
 2. **Install required Python Packages**

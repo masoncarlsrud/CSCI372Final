@@ -3,6 +3,8 @@ from tkinter import messagebox
 from API_integration import get_weather_data, get_forecast_data  # Importing the API integration methods
 from datetime import datetime  # Importing the datetime module
 from PIL import Image, ImageTk  # Importing the Pillow library
+import requests
+from io import BytesIO
 
 def create_gui():
     root = tk.Tk()
@@ -43,6 +45,9 @@ def create_gui():
 
     scrollbar.config(command=weather_display.yview)
 
+    # Store image references in the Text widget
+    weather_display.image_references = []
+
     def show_weather():
         location = location_entry.get()
         if location:
@@ -68,37 +73,39 @@ def display_weather(weather_data, forecast_data, display_area):
         current_weather += f"Temperature: {weather_data['main']['temp']}°F\n"
         current_weather += f"Humidity: {weather_data['main']['humidity']}%\n"
         current_weather += f"Wind Speed: {weather_data['wind']['speed']} mph\n"
-        current_weather += f"Description: {weather_data['weather'][0]['description']}\n\n"
-        display_area.insert(tk.END, current_weather)
+        current_weather += f"Sunrise: {datetime.fromtimestamp(weather_data['sys']['sunrise']).strftime('%I:%M %p')}\n"
+        current_weather += f"Sunset: {datetime.fromtimestamp(weather_data['sys']['sunset']).strftime('%I:%M %p')}\n"
+        current_weather += f"Description: {weather_data['weather'][0]['description']}\n"  
+        current_weather += f"The icon for the weather is shown below:\n\n"      
+        # Fetch and add weather icon for current weather
+        icon_code = weather_data['weather'][0]['icon']
+        icon_url = f"http://openweathermap.org/img/wn/{icon_code}.png"
+        try:
+            response = requests.get(icon_url)
+            icon_image = Image.open(BytesIO(response.content))
+            icon_image = icon_image.resize((50, 50), Image.LANCZOS)  # Use Image.LANCZOS instead of Image.ANTIALIAS
+            icon_photo = ImageTk.PhotoImage(icon_image)
+            display_area.image_references.append(icon_photo)  # Keep a reference to avoid garbage collection
+            display_area.insert(tk.END, current_weather)
+            display_area.image_create(tk.END, image=icon_photo)
+            display_area.insert(tk.END, "\n\n\n\n")
+        except Exception as e:
+            display_area.insert(tk.END, f"{current_weather}Error loading icon: {e}\n\n")
 
         forecast = "5 Day Forecast:\n"
-        images = []  # List to keep references to image objects
-        x = 4
-        for item in forecast_data['list'][:40]:
-            if x % 8 == 0:
-                date_time_obj = datetime.strptime(item['dt_txt'], '%Y-%m-%d %H:%M:%S')
-                formatted_date = date_time_obj.strftime('%A, %B %d, %Y %I:%M %p')
-                
-                forecast += f"Date: {formatted_date}\n"
-                forecast += f"Temperature: {item['main']['temp']}°F\n"
-                forecast += f"Humidity: {item['main']['humidity']}%\n"
-                forecast += f"Wind Speed: {item['wind']['speed']} mph\n"
-                forecast += f"Description: {item['weather'][0]['description']}\n"
-                
-                # Add weather icon
-                icon_code = item['weather'][0]['icon']
-                icon_path = f"icons/{icon_code}.png"
-                try:
-                    icon_image = Image.open(icon_path)
-                    icon_image = icon_image.resize((50, 50), Image.LANCZOS)  # Use Image.LANCZOS instead of Image.ANTIALIAS
-                    icon_photo = ImageTk.PhotoImage(icon_image)
-                    images.append(icon_photo)  # Keep a reference to avoid garbage collection
-                    display_area.insert(tk.END, "\n")
-                    display_area.image_create(tk.END, image=icon_photo)
-                    display_area.insert(tk.END, "\n\n")
-                except Exception as e:
-                    display_area.insert(tk.END, f"Error loading icon: {e}\n\n")
-            x += 1
         display_area.insert(tk.END, forecast)
+        noon_forecasts = [item for item in forecast_data['list'] if '12:00:00' in item['dt_txt']]
+        for item in noon_forecasts[:5]:
+            date_time_obj = datetime.strptime(item['dt_txt'], '%Y-%m-%d %H:%M:%S')
+            formatted_date = date_time_obj.strftime('%A, %B %d, %Y %I:%M %p')
+            
+            entry = f"Date: {formatted_date}\n"
+            entry += f"Temperature: {item['main']['temp']}°F\n"
+            entry += f"Humidity: {item['main']['humidity']}%\n"
+            entry += f"Wind Speed: {item['wind']['speed']} mph\n"
+            entry += f"Description: {item['weather'][0]['description']}\n"
+            
+            display_area.insert(tk.END, entry)
+            display_area.insert(tk.END, "\n\n")
     else:
         display_area.insert(tk.END, "Error fetching weather data")

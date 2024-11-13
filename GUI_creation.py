@@ -6,6 +6,7 @@ from PIL import Image, ImageTk  # Importing the Pillow library
 import requests
 from io import BytesIO
 
+# Function to create the GUI for the weather app
 def create_gui():
     root = tk.Tk()
     root.title("Weather App")
@@ -68,6 +69,7 @@ def create_gui():
 
 def create_image(icon_code, display_area):
     icon_url = f"http://openweathermap.org/img/wn/{icon_code}.png"
+    # Load the image from the URL and display it in the text widget
     try:
         response = requests.get(icon_url)
         icon_image = Image.open(BytesIO(response.content))
@@ -81,6 +83,7 @@ def create_image(icon_code, display_area):
 def display_weather(weather_data, forecast_data, display_area):
     display_area.delete(1.0, tk.END)
     if weather_data.get('cod') == 200:
+        # Display the current weather data
         current_weather = (
             f"Current Weather in {weather_data['name']}:\n"
             f"Temperature: {weather_data['main']['temp']}°F\n"
@@ -99,12 +102,14 @@ def display_weather(weather_data, forecast_data, display_area):
         display_area.insert(tk.END, "\n\n")
 
         forecast = "5 Day Forecast:\n"
-        display_area.insert(tk.END, forecast)
+        display_area.insert(tk.END, forecast) #inserting the forecast into the GUI
+        # Filter the forecast data to only include noon forecasts for the next 5 days
         noon_forecasts = [item for item in forecast_data['list'] if '12:00:00' in item['dt_txt']]
         for item in noon_forecasts[:5]:
+            # Convert the forecast date to a human-readable format
             date_time_obj = datetime.strptime(item['dt_txt'], '%Y-%m-%d %H:%M:%S')
             formatted_date = date_time_obj.strftime('%A, %B %d, %Y %I:%M %p')
-            
+            # Add the forecast data to the display area
             entry = (
                 f"Date: {formatted_date}\n"
                 f"Temperature: {item['main']['temp']}°F\n"
@@ -112,10 +117,11 @@ def display_weather(weather_data, forecast_data, display_area):
                 f"Wind Speed: {item['wind']['speed']} mph\n"
                 f"Description: {item['weather'][0]['description']}\n"
             )
-            
+            # Fetch and add weather icon for forecast
             display_area.insert(tk.END, entry)
             icon_code = item['weather'][0]['icon']
             create_image(icon_code, display_area)
             display_area.insert(tk.END, "\n\n")
     else:
+        # Display an error message if the location is not found
         display_area.insert(tk.END, "Error fetching weather data")

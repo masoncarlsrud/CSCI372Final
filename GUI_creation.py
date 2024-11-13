@@ -86,6 +86,7 @@ def display_weather(weather_data, forecast_data, display_area):
             f"Temperature: {weather_data['main']['temp']}°F\n"
             f"Humidity: {weather_data['main']['humidity']}%\n"
             f"Wind Speed: {weather_data['wind']['speed']} mph\n"
+            # Convert sunrise and sunset timestamps to human-readable format
             f"Sunrise: {datetime.fromtimestamp(weather_data['sys']['sunrise']).strftime('%I:%M %p')}\n"
             f"Sunset: {datetime.fromtimestamp(weather_data['sys']['sunset']).strftime('%I:%M %p')}\n"
             f"Description: {weather_data['weather'][0]['description']}\n\n"
@@ -94,7 +95,7 @@ def display_weather(weather_data, forecast_data, display_area):
         # Fetch and add weather icon for current weather
         icon_code = weather_data['weather'][0]['icon']
         display_area.insert(tk.END, current_weather)
-        create_image(icon_code, display_area)
+        create_image(icon_code, display_area) #actually creating the image to input into the GUI
         display_area.insert(tk.END, "\n\n")
 
         forecast = "5 Day Forecast:\n"
